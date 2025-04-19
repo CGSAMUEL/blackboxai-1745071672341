@@ -54,9 +54,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="bg-green-600 p-3 rounded mb-4"><?php echo htmlspecialchars($message); ?></div>
     <?php endif; ?>
     <p>Última actualización de datos desde la API: <strong><?php echo htmlspecialchars($lastUpdate); ?></strong></p>
-    <form method="POST" class="mt-4 space-x-4">
-        <button type="submit" name="action" value="reset" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded">Borrar datos de la base</button>
-        <button type="submit" name="action" value="fetch" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded">Actualizar datos desde la API</button>
-    </form>
+<form method="POST" class="mt-4 space-x-4">
+    <button type="submit" name="action" value="reset" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded">Borrar datos de la base</button>
+    <button type="submit" name="action" value="fetch" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded">Actualizar datos desde la API</button>
+</form>
+
+<h2 class="text-2xl font-semibold mt-8 mb-4">Gestión de Usuarios</h2>
+<p><a href="users.php" class="text-red-500 hover:underline">Ir a la gestión de usuarios</a></p>
+
+<h2 class="text-2xl font-semibold mt-8 mb-4">Resumen de Datos</h2>
+<p><a href="summary.php" class="text-red-500 hover:underline">Ver resumen de datos</a></p>
 </body>
 </html>
