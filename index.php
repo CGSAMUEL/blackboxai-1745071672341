@@ -3,7 +3,7 @@ session_start();
 if (isset($_GET['guest'])) {
     // Set anonymous user session
     $_SESSION['username'] = 'Anonymous';
-    header('Location: main.php');
+    header('Location: frontoffice/anonymous.php');
     exit();
 }
 ?>
@@ -64,9 +64,9 @@ if (isset($_GET['guest'])) {
     <main class="w-full max-w-md space-y-6">
         <a href="?guest=1" class="btn-marvel block text-center py-3 rounded-lg font-semibold text-white shadow-lg hover:shadow-2xl">Continue as Guest</a>
 
-        <a href="#register" class="btn-marvel block text-center py-3 rounded-lg font-semibold text-white shadow-lg hover:shadow-2xl">Register</a>
+        <a href="registration.php" class="btn-marvel block text-center py-3 rounded-lg font-semibold text-white shadow-lg hover:shadow-2xl">Register</a>
 
-        <a href="#login" class="btn-marvel block text-center py-3 rounded-lg font-semibold text-white shadow-lg hover:shadow-2xl">Login</a>
+        <a href="login.php" class="btn-marvel block text-center py-3 rounded-lg font-semibold text-white shadow-lg hover:shadow-2xl">Login</a>
 
         <div class="flex justify-center space-x-6 mt-6">
             <button aria-label="Login with Google" class="social-btn btn-marvel p-3 rounded-full shadow-lg hover:shadow-2xl" onclick="alert('Google login placeholder')">
