@@ -3,6 +3,11 @@ session_start();
 include 'conexionDB.php';
 
 $errors = [];
+$success = '';
+
+if (isset($_GET['registered']) && $_GET['registered'] == '1') {
+    $success = "Registro exitoso. Puedes iniciar sesión ahora.";
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
@@ -70,6 +75,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <button type="submit" class="w-full bg-red-600 hover:bg-red-700 p-3 rounded font-semibold">Iniciar Sesión</button>
         </form>
+        <?php if ($success): ?>
+            <div class="bg-green-600 p-3 rounded mb-4 mt-4 text-center">
+                <?php echo htmlspecialchars($success); ?>
+            </div>
+        <?php endif; ?>
         <p class="mt-4 text-center">
             ¿No tienes cuenta? <a href="registration.php" class="text-red-500 hover:underline">Regístrate</a>
         </p>
