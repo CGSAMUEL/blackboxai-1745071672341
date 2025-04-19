@@ -48,39 +48,57 @@ if (!isset($_SESSION['username'])) {
     </div>
 
     <script>
-        // Example data - replace with AJAX calls to fetch real data from PHP endpoints
-        const barData = {
-            labels: ['2018', '2019', '2020', '2021', '2022', '2023'],
-            datasets: [{
-                label: 'Personajes modificados',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: 'rgba(255, 99, 132, 0.7)'
-            }]
+        async function fetchChartData() {
+            const response = await fetch('charts_data.php');
+            const data = await response.json();
+
+            return data;
+        }
+
+        const barConfig = {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Personajes modificados',
+                    data: [],
+                    backgroundColor: 'rgba(255, 99, 132, 0.7)'
+                }]
+            },
+            options: {}
         };
 
-        const pieData = {
-            labels: ['Comic', 'Graphic Novel', 'Trade Paperback', 'Hardcover'],
-            datasets: [{
-                label: 'Formatos',
-                data: [300, 50, 100, 75],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.7)',
-                    'rgba(54, 162, 235, 0.7)',
-                    'rgba(255, 206, 86, 0.7)',
-                    'rgba(75, 192, 192, 0.7)'
-                ]
-            }]
+        const pieConfig = {
+            type: 'pie',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Formatos',
+                    data: [],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)'
+                    ]
+                }]
+            },
+            options: {}
         };
 
-        const lineData = {
-            labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio'],
-            datasets: [{
-                label: 'Comics publicados',
-                data: [65, 59, 80, 81, 56, 55, 40],
-                fill: false,
-                borderColor: 'rgba(255, 99, 132, 0.7)',
-                tension: 0.1
-            }]
+        const lineConfig = {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Comics publicados',
+                    data: [],
+                    fill: false,
+                    borderColor: 'rgba(255, 99, 132, 0.7)',
+                    tension: 0.1
+                }]
+            },
+            options: {}
         };
 
         const barConfig = {
@@ -112,6 +130,37 @@ if (!isset($_SESSION['username'])) {
         );
 
         new Chart(
+            document.getElementById('lineChart'),
+            lineConfig
+        );
+
+        // Fetch data and update charts
+        fetchChartData().then(data => {
+            barConfig.data.labels = data.bar.labels;
+            barConfig.data.datasets[0].data = data.bar.data;
+            pieConfig.data.labels = data.pie.labels;
+            pieConfig.data.datasets[0].data = data.pie.data;
+            lineConfig.data.labels = data.line.labels;
+            lineConfig.data.datasets[0].data = data.line.data;
+
+            // Update charts
+            window.barChart.update();
+            window.pieChart.update();
+            window.lineChart.update();
+        });
+
+        // Initialize charts globally for update
+        window.barChart = new Chart(
+            document.getElementById('barChart'),
+            barConfig
+        );
+
+        window.pieChart = new Chart(
+            document.getElementById('pieChart'),
+            pieConfig
+        );
+
+        window.lineChart = new Chart(
             document.getElementById('lineChart'),
             lineConfig
         );
