@@ -76,13 +76,13 @@ $admin = $_SESSION['admin'] ?? 0;
                 fetchList('buscarPersonajes.php', { nombre: document.getElementById('characterName').value }, 'charactersList');
             });
             document.getElementById('comicName').addEventListener('input', () => {
-                fetchList('buscarComics.php', { nombre: document.getElementById('characterName').value, fecha: document.getElementById('comicDate').value }, 'comicsList');
+                fetchList('buscarComics.php', { nombre: document.getElementById('comicName').value, fecha: document.getElementById('comicDate').value }, 'comicsList');
             });
             document.getElementById('comicDate').addEventListener('change', () => {
-                fetchList('buscarComics.php', { nombre: document.getElementById('characterName').value, fecha: document.getElementById('comicDate').value }, 'comicsList');
+                fetchList('buscarComics.php', { nombre: document.getElementById('comicName').value, fecha: document.getElementById('comicDate').value }, 'comicsList');
             });
             document.getElementById('creatorName').addEventListener('input', () => {
-                fetchList('buscarCreadores.php', { nombre: document.getElementById('characterName').value, creador: document.getElementById('creatorName').value }, 'creatorsList');
+                fetchList('buscarCreadores.php', { nombre: document.getElementById('creatorName').value }, 'creatorsList');
             });
         }
 
