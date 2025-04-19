@@ -96,9 +96,12 @@ $admin = $_SESSION['admin'] ?? 0;
     </script>
 </head>
 <body>
-    <header>
+    <header class="flex justify-between items-center bg-red-700 p-4 text-white">
         <div>Bienvenido, <?php echo htmlspecialchars($username); ?></div>
-        <div><a href="logout.php" class="text-white hover:underline">Cerrar sesión</a></div>
+        <nav>
+            <a href="profile.php" class="mr-4 hover:underline">Mi Perfil</a>
+            <a href="logout.php" class="hover:underline">Cerrar sesión</a>
+        </nav>
     </header>
     <main>
         <section class="list-section">
