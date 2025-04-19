@@ -34,7 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $insert_stmt = $conexion->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
             $insert_stmt->bind_param('sss', $username, $email, $password_hash);
             if ($insert_stmt->execute()) {
-                $success = "Registro exitoso. Puedes iniciar sesión ahora.";
+                // Redirect to login page after successful registration
+                header('Location: login.php?registered=1');
+                exit();
             } else {
                 $errors[] = "Error al registrar el usuario.";
             }
