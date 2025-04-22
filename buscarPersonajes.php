@@ -9,17 +9,36 @@
      * Función para obtener los personajes filtrados por nombre.
      * Este método obtiene el listado de personajes desde una conexión a la DB.
      */
-    function obtenerPersonajesPorNombreDesdeDB($nombre_personaje, $modo_estricto) {
+    function obtenerPersonajesPorNombreDesdeDB($nombre_personaje, $modo_estricto, $creator_id = null) {
         // Obtener la conexión
         $conexion = conectarDB();
 
-        // Evitar inyecciones SQL utilizando prepared statements
-        $query = "SELECT * FROM final_characters WHERE name LIKE ?";
-        $stmt = $conexion->prepare($query);
-        $nombre_busqueda = $modo_estricto=="true" ? $nombre_personaje : "%" . $nombre_personaje . "%"; // Usar el porcentaje para buscar coincidencias parciales
-        $stmt->bind_param('s', $nombre_busqueda);
+        // Construir la consulta base con join para filtrar por creador si se proporciona
+        $query = "SELECT DISTINCT fc.* FROM final_characters fc
+                  LEFT JOIN final_creator_characters fcc ON fc.id = fcc.character_id
+                  LEFT JOIN final_creators fcr ON fcc.creator_id = fcr.id
+                  WHERE fc.name LIKE ?";
 
-        //error_log("Query: ".$query." / nombre_busqueda: ".$nombre_busqueda,3,"log.txt");
+        // Parámetros para bind_param
+        $params = [];
+        $types = "s";
+        $nombre_busqueda = $modo_estricto=="true" ? $nombre_personaje : "%" . $nombre_personaje . "%";
+        $params[] = &$nombre_busqueda;
+
+        if ($creator_id !== null && $creator_id !== '') {
+            $query .= " AND fcr.id = ?";
+            $types .= "i";
+            $params[] = &$creator_id;
+        }
+
+        $stmt = $conexion->prepare($query);
+        // Bind parameters dynamically with references
+        $bind_names = [];
+        $bind_names[] = $types;
+        for ($i=0; $i<count($params); $i++) {
+            $bind_names[] = &$params[$i];
+        }
+        call_user_func_array(array($stmt, 'bind_param'), $bind_names);
 
         // Ejecutar la consulta
         $stmt->execute();
@@ -47,9 +66,10 @@
     // Obtener el nombre del personaje de la solicitud (puede ser un formulario o parámetro GET)
     $nombre_personaje = isset($_GET['nombre']) ? $_GET['nombre'] : '';
     $modo_estricto = isset($_GET['strict']) ? $_GET['strict'] : false;
+    $creator_id = isset($_GET['creator_id']) ? $_GET['creator_id'] : null;
 
     // Llamar a la función para obtener los personajes
-    $personajes = obtenerPersonajesPorNombreDesdeDB($nombre_personaje, $modo_estricto);
+    $personajes = obtenerPersonajesPorNombreDesdeDB($nombre_personaje, $modo_estricto, $creator_id);
 
     // Mostrar los resultados
     if (count($personajes) > 0) {

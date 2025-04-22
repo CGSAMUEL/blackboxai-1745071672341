@@ -7,30 +7,49 @@
      * Función para obtener los creadores filtrados por nombre.
      * Este método obtiene el listado de creadores desde una conexión a la DB.
      */
-    function obtenerCreadores($nombre_personaje, $nombre_creador) {
+    function obtenerCreadores($character_id, $nombre_creador) {
         // Obtener la conexión
         $conexion = conectarDB();
 
-        $nombre_busqueda = "%" . $nombre_personaje. "%"; // Usar el porcentaje para buscar coincidencias parciales
-        
         // Evitar inyecciones SQL utilizando prepared statements
-        $query = "select full_name, creator_id
-                  from final_creators fcre
-                  join final_creator_characters fcrechar
-                  on fcre.id = fcrechar.creator_id
-                  join final_characters fchar
-                  on fchar.id = character_id
-                  where name like ?";
+        $query = "SELECT DISTINCT fcr.full_name, fcr.id AS creator_id
+                  FROM final_creators fcr
+                  LEFT JOIN final_creator_characters fcc ON fcr.id = fcc.creator_id
+                  LEFT JOIN final_characters fc ON fcc.character_id = fc.id";
 
-        if ($nombre_creador) {
-            $query .= " and full_name like ?";
-            $stmt = $conexion->prepare($query);
-            $stmt->bind_param('ss', $nombre_busqueda, $nombre_creador);
-        } else {
-            $stmt = $conexion->prepare($query);
-            $stmt->bind_param('s', $nombre_busqueda);
+        $params = [];
+        $types = "";
+
+        $whereClauses = [];
+
+        if ($character_id !== null && $character_id !== '') {
+            $whereClauses[] = "fc.id = ?";
+            $types .= "i";
+            $params[] = &$character_id;
         }
-        
+
+        if ($nombre_creador !== null && $nombre_creador !== '') {
+            $whereClauses[] = "fcr.full_name LIKE ?";
+            $types .= "s";
+            $nombre_creador_like = "%" . $nombre_creador . "%";
+            $params[] = &$nombre_creador_like;
+        }
+
+        if (count($whereClauses) > 0) {
+            $query .= " WHERE " . implode(" AND ", $whereClauses);
+        }
+
+        $stmt = $conexion->prepare($query);
+
+        if ($types !== "") {
+            $bind_names = [];
+            $bind_names[] = $types;
+            for ($i=0; $i<count($params); $i++) {
+                $bind_names[] = &$params[$i];
+            }
+            call_user_func_array(array($stmt, 'bind_param'), $bind_names);
+        }
+
         // Ejecutar la consulta
         $stmt->execute();
 
@@ -53,12 +72,18 @@
         return $creadores;
     }
 
-    // Obtener el nombre del creador de la solicitud (puede ser un formulario o parámetro GET)
-    $nombre_personaje = isset($_GET['nombre']) ? $_GET['nombre'] : '';
-    $nombre_creador = isset($_GET['creador']) ? $_GET['creador'] : '';
+    // Obtener el nombre del creador y character_id de la solicitud (puede ser un formulario o parámetro GET)
+    $character_id = isset($_GET['character_id']) ? $_GET['character_id'] : null;
+    $nombre_creador = isset($_GET['nombre']) ? $_GET['nombre'] : '';
+
+    // Debug output for received parameters
+    error_log("buscarCreadores.php called with character_id: " . var_export($character_id, true) . ", nombre: " . var_export($nombre_creador, true));
 
     // Llamar a la función para obtener los creadores
-    $creadores = obtenerCreadores($nombre_personaje, trim($nombre_creador));
+    $creadores = obtenerCreadores($character_id, trim($nombre_creador));
+
+    // Debug output for number of creators found
+    error_log("Number of creators found: " . count($creadores));
 
     // Mostrar los resultados
     if (count($creadores) > 0) {

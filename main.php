@@ -66,6 +66,20 @@ if (isset($_SESSION['username'])) {
     <main class="flex-grow p-8">
         <p class="text-lg text-gray-300">Welcome to the main page. Here you can display Marvel information and user-specific content.</p>
         <!-- Content to be added here -->
+        <?php if (isset($_SESSION['username'])): ?>
+            <section class="mt-8">
+                <h2 class="text-2xl font-bold mb-4">Data Charts</h2>
+                <p class="mb-4">Access the data charts below:</p>
+                <a href="charts.php" class="btn-marvel inline-block px-4 py-2 rounded text-white font-semibold">View Charts</a>
+            </section>
+            <section class="mt-8">
+                <h2 class="text-2xl font-bold mb-4">Download PDFs</h2>
+                <p class="mb-4">Download charts and search results as PDF files:</p>
+                <a href="pdf_export.php" class="btn-marvel inline-block px-4 py-2 rounded text-white font-semibold">Download PDF</a>
+            </section>
+        <?php else: ?>
+            <p class="mt-8 text-red-500 font-semibold">Please log in to access charts and download PDFs.</p>
+        <?php endif; ?>
     </main>
 
     <footer class="text-center text-gray-500 text-sm p-4 select-none border-t border-gray-700">

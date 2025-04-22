@@ -3,7 +3,7 @@ session_start();
 if (isset($_GET['guest'])) {
     // Set anonymous user session
     $_SESSION['username'] = 'Anonymous';
-    header('Location: frontoffice/anonymous.php');
+    header('Location: dashboard.php');
     exit();
 }
 ?>
