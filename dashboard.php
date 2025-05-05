@@ -196,6 +196,7 @@ $conexion->close();
             <canvas id="pieChart" class="mb-6"></canvas>
             <canvas id="lineChart" class="mb-6"></canvas>
             <button id="downloadChartsPdf" class="btn-marvel px-4 py-2 rounded text-white font-semibold">Descargar PDF de Gráficos</button>
+            <div id="chartsDataSummary" class="mt-6 p-4 bg-gray-800 rounded text-white text-sm overflow-auto" style="max-height: 300px;"></div>
         </section>
         <?php else: ?>
         <section class="chart-container">
@@ -229,7 +230,12 @@ $conexion->close();
                 fetchList('buscarComics.php', { nombre: document.getElementById('comicName').value, fecha: document.getElementById('comicDate').value }, 'comicsList');
             });
             document.getElementById('creatorName').addEventListener('input', () => {
-                fetchList('buscarCreadores.php', { nombre: document.getElementById('creatorName').value }, 'creatorsList');
+                const characterFilter = document.getElementById('characterFilterForCreators').value;
+                fetchList('buscarCreadores.php', { nombre: document.getElementById('creatorName').value, character_id: characterFilter }, 'creatorsList');
+            });
+            document.getElementById('characterFilterForCreators').addEventListener('change', () => {
+                const characterFilter = document.getElementById('characterFilterForCreators').value;
+                fetchList('buscarCreadores.php', { nombre: document.getElementById('creatorName').value, character_id: characterFilter }, 'creatorsList');
             });
 
                 // PDF download buttons
@@ -319,21 +325,56 @@ $conexion->close();
                             options: {}
                         });
 
-                        window.lineChartInstance = new Chart(lineCtx, {
-                            type: 'line',
-                            data: {
-                                labels: data.line.labels,
-                                datasets: [{
-                                    label: 'Comics publicados',
-                                    data: data.line.data,
-                                    fill: false,
-                                    borderColor: 'rgba(255, 99, 132, 0.7)',
-                                    tension: 0.1
-                                }]
-                            },
-                            options: {}
-                        });
+                    window.lineChartInstance = new Chart(lineCtx, {
+                        type: 'line',
+                        data: {
+                            labels: data.line.labels,
+                            datasets: [{
+                                label: 'Comics publicados',
+                                data: data.line.data,
+                                fill: false,
+                                borderColor: 'rgba(255, 99, 132, 0.7)',
+                                tension: 0.1
+                            }]
+                        },
+                        options: {}
                     });
+
+                    // Render summary data below charts
+                    const summaryDiv = document.getElementById('chartsDataSummary');
+                    if (summaryDiv) {
+                        let html = '<h3 class="text-lg font-semibold mb-2">Resumen de Datos de los Gráficos</h3>';
+
+                        // Bar chart summary
+                        html += '<h4 class="font-semibold mt-2">Personajes modificados por año</h4>';
+                        html += '<table class="w-full text-left border-collapse border border-gray-600">';
+                        html += '<thead><tr><th class="border border-gray-600 px-2">Año</th><th class="border border-gray-600 px-2">Cantidad</th></tr></thead><tbody>';
+                        for (let i = 0; i < data.bar.labels.length; i++) {
+                            html += `<tr><td class="border border-gray-600 px-2">${data.bar.labels[i]}</td><td class="border border-gray-600 px-2">${data.bar.data[i]}</td></tr>`;
+                        }
+                        html += '</tbody></table>';
+
+                        // Pie chart summary
+                        html += '<h4 class="font-semibold mt-4">Distribución de formatos de comics</h4>';
+                        html += '<table class="w-full text-left border-collapse border border-gray-600">';
+                        html += '<thead><tr><th class="border border-gray-600 px-2">Formato</th><th class="border border-gray-600 px-2">Cantidad</th></tr></thead><tbody>';
+                        for (let i = 0; i < data.pie.labels.length; i++) {
+                            html += `<tr><td class="border border-gray-600 px-2">${data.pie.labels[i]}</td><td class="border border-gray-600 px-2">${data.pie.data[i]}</td></tr>`;
+                        }
+                        html += '</tbody></table>';
+
+                        // Line chart summary
+                        html += '<h4 class="font-semibold mt-4">Comics publicados por mes (año actual)</h4>';
+                        html += '<table class="w-full text-left border-collapse border border-gray-600">';
+                        html += '<thead><tr><th class="border border-gray-600 px-2">Mes</th><th class="border border-gray-600 px-2">Cantidad</th></tr></thead><tbody>';
+                        for (let i = 0; i < data.line.labels.length; i++) {
+                            html += `<tr><td class="border border-gray-600 px-2">${data.line.labels[i]}</td><td class="border border-gray-600 px-2">${data.line.data[i]}</td></tr>`;
+                        }
+                        html += '</tbody></table>';
+
+                        summaryDiv.innerHTML = html;
+                    }
+                });
             };
         </script>
     </main>
