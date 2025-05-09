@@ -36,18 +36,51 @@ function exportChartsPDF() {
     $pieImage = $_POST['pieImage'] ?? null;
     $lineImage = $_POST['lineImage'] ?? null;
 
-    $html = '<h1>Gráficos de Marvel Info</h1>';
-
     if ($barImage && $pieImage && $lineImage) {
-        // Embed images in PDF
-        $html .= '<h2>Gráfico de barras: Personajes modificados por año</h2>';
-        $html .= '<img src="' . $barImage . '" style="width: 600px; height: 300px;" />';
+        $pdf = new TCPDF();
+        $pdf->SetCreator(PDF_CREATOR);
+        $pdf->SetAuthor('Marvel Info');
+        $pdf->SetTitle('Gráficos de Marvel Info');
+        $pdf->SetHeaderData('', 0, 'Marvel Info', 'Gráficos de Marvel Info');
+        $pdf->setHeaderFont(Array('helvetica', '', 12));
+        $pdf->setFooterFont(Array('helvetica', '', 10));
+        $pdf->SetMargins(15, 27, 15);
+        $pdf->SetHeaderMargin(5);
+        $pdf->SetFooterMargin(10);
+        $pdf->SetAutoPageBreak(TRUE, 25);
 
-        $html .= '<h2>Gráfico de tarta: Distribución de comics por formato</h2>';
-        $html .= '<img src="' . $pieImage . '" style="width: 600px; height: 300px;" />';
+        // Page 1 - Bar Chart
+        $pdf->AddPage();
+        $pdf->SetFont('helvetica', 'B', 16);
+        $pdf->Cell(0, 15, 'Gráfico de barras: Personajes modificados por año', 0, 1, 'C');
+        $barImageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $barImage));
+        $barTempFile = tempnam(sys_get_temp_dir(), 'bar_') . '.png';
+        file_put_contents($barTempFile, $barImageData);
+        $pdf->Image($barTempFile, 15, 40, 180, 90, 'PNG');
 
-        $html .= '<h2>Gráfico de líneas: Comics publicados por mes</h2>';
-        $html .= '<img src="' . $lineImage . '" style="width: 600px; height: 300px;" />';
+        // Page 2 - Pie Chart
+        $pdf->AddPage();
+        $pdf->SetFont('helvetica', 'B', 16);
+        $pdf->Cell(0, 15, 'Gráfico de tarta: Distribución de comics por formato', 0, 1, 'C');
+        $pieImageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $pieImage));
+        $pieTempFile = tempnam(sys_get_temp_dir(), 'pie_') . '.png';
+        file_put_contents($pieTempFile, $pieImageData);
+        $pdf->Image($pieTempFile, 15, 40, 180, 90, 'PNG');
+
+        // Page 3 - Line Chart
+        $pdf->AddPage();
+        $pdf->SetFont('helvetica', 'B', 16);
+        $pdf->Cell(0, 15, 'Gráfico de líneas: Comics publicados por mes', 0, 1, 'C');
+        $lineImageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $lineImage));
+        $lineTempFile = tempnam(sys_get_temp_dir(), 'line_') . '.png';
+        file_put_contents($lineTempFile, $lineImageData);
+        $pdf->Image($lineTempFile, 15, 40, 180, 90, 'PNG');
+
+        $pdf->Output('charts.pdf', 'I');
+        // Delete temporary image files
+        @unlink($barTempFile);
+        @unlink($pieTempFile);
+        @unlink($lineTempFile);
     } else {
         // Fallback to data tables if images not provided
 
@@ -91,6 +124,8 @@ function exportChartsPDF() {
         }
 
         // Compose tables
+        $html = '<h1>Gráficos de Marvel Info</h1>';
+
         $html .= '<h2>Personajes modificados por año</h2><table border="1" cellpadding="5"><thead><tr><th>Año</th><th>Conteo</th></tr></thead><tbody>';
         foreach ($barLabels as $index => $label) {
             $html .= '<tr><td>' . htmlspecialchars($label) . '</td><td>' . htmlspecialchars($barData[$index]) . '</td></tr>';
@@ -108,11 +143,11 @@ function exportChartsPDF() {
             $html .= '<tr><td>' . htmlspecialchars($label) . '</td><td>' . htmlspecialchars($lineData[$index]) . '</td></tr>';
         }
         $html .= '</tbody></table>';
+
+        generatePDF($html, 'charts.pdf');
     }
 
     $conexion->close();
-
-    generatePDF($html, 'charts.pdf');
 }
 
 function exportCharactersPDF($nombre) {
