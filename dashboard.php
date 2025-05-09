@@ -265,17 +265,55 @@ $conexion->close();
                     document.body.removeChild(form);
                 });
                 document.getElementById('downloadCharactersPdf').addEventListener('click', () => {
-                    const name = document.getElementById('characterName').value;
-                    window.open('pdf_export.php?type=characters&nombre=' + encodeURIComponent(name), '_blank');
+                    const htmlContent = document.getElementById('charactersList').innerHTML;
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = 'pdf_export.php?type=characters';
+                    form.target = '_blank';
+
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'htmlContent';
+                    input.value = htmlContent;
+                    form.appendChild(input);
+
+                    document.body.appendChild(form);
+                    form.submit();
+                    document.body.removeChild(form);
                 });
                 document.getElementById('downloadComicsPdf').addEventListener('click', () => {
-                    const name = document.getElementById('comicName').value;
-                    const date = document.getElementById('comicDate').value;
-                    window.open('pdf_export.php?type=comics&nombre=' + encodeURIComponent(name) + '&fecha=' + encodeURIComponent(date), '_blank');
+                    const htmlContent = document.getElementById('comicsList').innerHTML;
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = 'pdf_export.php?type=comics';
+                    form.target = '_blank';
+
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'htmlContent';
+                    input.value = htmlContent;
+                    form.appendChild(input);
+
+                    document.body.appendChild(form);
+                    form.submit();
+                    document.body.removeChild(form);
                 });
                 document.getElementById('downloadCreatorsPdf').addEventListener('click', () => {
-                    const name = document.getElementById('creatorName').value;
-                    window.open('pdf_export.php?type=creators&nombre=' + encodeURIComponent(name), '_blank');
+                    const htmlContent = document.getElementById('creatorsList').innerHTML;
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = 'pdf_export.php?type=creators';
+                    form.target = '_blank';
+
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'htmlContent';
+                    input.value = htmlContent;
+                    form.appendChild(input);
+
+                    document.body.appendChild(form);
+                    form.submit();
+                    document.body.removeChild(form);
                 });
             }
 

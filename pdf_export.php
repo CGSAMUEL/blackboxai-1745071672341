@@ -116,6 +116,12 @@ function exportChartsPDF() {
 }
 
 function exportCharactersPDF($nombre) {
+    if (!empty($_POST['htmlContent'])) {
+        $htmlContent = $_POST['htmlContent'];
+        generatePDF($htmlContent, 'personajes.pdf');
+        return;
+    }
+
     $conexion = conectarDB();
     $nombre = $conexion->real_escape_string($nombre);
 
@@ -132,6 +138,12 @@ function exportCharactersPDF($nombre) {
 }
 
 function exportComicsPDF($nombre, $fecha) {
+    if (!empty($_POST['htmlContent'])) {
+        $htmlContent = $_POST['htmlContent'];
+        generatePDF($htmlContent, 'comics.pdf');
+        return;
+    }
+
     $conexion = conectarDB();
     $nombre = $conexion->real_escape_string($nombre);
     $fecha = $conexion->real_escape_string($fecha);
@@ -154,6 +166,12 @@ function exportComicsPDF($nombre, $fecha) {
 }
 
 function exportCreatorsPDF($nombre) {
+    if (!empty($_POST['htmlContent'])) {
+        $htmlContent = $_POST['htmlContent'];
+        generatePDF($htmlContent, 'creadores.pdf');
+        return;
+    }
+
     $conexion = conectarDB();
     $nombre = $conexion->real_escape_string($nombre);
 
@@ -194,16 +212,4 @@ switch ($type) {
         break;
 }
 
-// Example: Export characters list to PDF
-$conexion = conectarDB();
-$query = "SELECT name, description FROM final_characters LIMIT 100";
-$result = $conexion->query($query);
-
-$html = '<h1>Marvel Characters</h1><table border="1" cellpadding="5"><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody>';
-while ($row = $result->fetch_assoc()) {
-    $html .= '<tr><td>' . htmlspecialchars($row['name']) . '</td><td>' . htmlspecialchars($row['description']) . '</td></tr>';
-}
-$html .= '</tbody></table>';
-
-generatePDF($html, 'marvel_characters.pdf');
 ?>
